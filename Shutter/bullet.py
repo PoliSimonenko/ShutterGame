@@ -1,35 +1,27 @@
 import pygame
-
-try:
-    from .config import *
-except ImportError:
-    GREEN = (0, 255, 0)
-    BULLET_SPEED = 7
-    BULLET_DAMAGE = 1
-    IMAGES_DIR = 'assets/images'
-
+import os
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, images_dir, bullet_width=25, bullet_height=25):
         super().__init__()
-        # Загрузка изображения
+        # Загрузка изображения пули или создание простого спрайта
         try:
-            image_path = os.path.join(IMAGES_DIR, 'bullet.png')
+            image_path = os.path.join(images_dir, 'bullet.png')
             self.image = pygame.image.load(image_path).convert_alpha()
-            self.image = pygame.transform.scale(self.image, (25, 25))
-        except Exception as e:
-            print(f"Ошибка загрузки изображения пули: {e}")
-            self.image = pygame.Surface((25, 25), pygame.SRCALPHA)
-            pygame.draw.rect(self.image, GREEN, (0, 0, 25, 25))
+            self.image = pygame.transform.scale(self.image, (bullet_width, bullet_height))
+        except:
+            self.image = pygame.Surface((bullet_width, bullet_height), pygame.SRCALPHA)
+            pygame.draw.rect(self.image, (0, 255, 0), (0, 0, bullet_width, bullet_height))
 
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.centery = y
-
-        self.speed = BULLET_SPEED
-        self.damage = BULLET_DAMAGE
+        self.speed = 7
+        self.damage = 1
 
     def update(self):
+        # Движение пули вверх
         self.rect.y -= self.speed
+        # Удаление пули, если она вышла за пределы экрана
         if self.rect.bottom < 0:
             self.kill()

@@ -4,7 +4,7 @@ from PIL import Image
 
 
 def create_icon_from_photo(photo_path, output_size=(32, 32)):
-    """Создает иконку из фотографии"""
+    #Создает иконку из фотографии
     try:
         # Открываем изображение с помощью PIL
         img = Image.open(photo_path)

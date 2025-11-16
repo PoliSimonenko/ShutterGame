@@ -1,36 +1,28 @@
 import pygame
-
-try:
-    from .config import *
-except ImportError:
-    YELLOW = (255, 255, 0)
-    IMAGES_DIR = 'assets/images'
-
+import os
 
 class Explosion(pygame.sprite.Sprite):
-    def __init__(self, center, all_sprites, sound_manager):
+    def __init__(self, center, all_sprites, sound_manager, images_dir):
         super().__init__(all_sprites)
+        # Загрузка кадров взрыва или создание простой анимации
         self.frames = []
-        # Загрузка кадров анимации
         for i in range(1, 4):
             try:
-                image_path = os.path.join(IMAGES_DIR, f'explosion{i}.png')
+                image_path = os.path.join(images_dir, f'explosion{i}.png')
                 frame = pygame.image.load(image_path).convert_alpha()
-                frame = pygame.transform.scale(frame, (40 + i * 10, 40 + i * 10))
+                frame = pygame.transform.scale(frame, (60 + i * 20, 60 + i * 20))
                 self.frames.append(frame)
-            except Exception as e:
-                print(f"Ошибка загрузки изображения взрыва {i}: {e}")
-                # Запасной вариант
-                frame = pygame.Surface((30 + i * 10, 30 + i * 10), pygame.SRCALPHA)
+            except:
+                frame = pygame.Surface((60 + i * 20, 60 + i * 20), pygame.SRCALPHA)
                 color = (255, 200 - i * 50, 0)
                 pygame.draw.circle(frame, color, (frame.get_width() // 2, frame.get_height() // 2),
                                    frame.get_width() // 2)
                 self.frames.append(frame)
 
+        # Если не удалось загрузить кадры, создаем простой взрыв
         if not self.frames:
-            # Запасной вариант
-            frame = pygame.Surface((30, 30), pygame.SRCALPHA)
-            pygame.draw.circle(frame, YELLOW, (15, 15), 15)
+            frame = pygame.Surface((60, 60), pygame.SRCALPHA)
+            pygame.draw.circle(frame, (255, 255, 0), (30, 30), 30)
             self.frames = [frame, frame, frame]
 
         self.image = self.frames[0]
@@ -43,6 +35,7 @@ class Explosion(pygame.sprite.Sprite):
         self.sound_manager.play_sound('explosion')
 
     def update(self):
+        # Анимация взрыва
         now = pygame.time.get_ticks()
         if now - self.last_update > self.frame_rate:
             self.last_update = now

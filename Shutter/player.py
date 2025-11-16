@@ -1,85 +1,63 @@
 import pygame
 import os
-
-try:
-    from .config import *
-except ImportError:
-    # Локальные константы если config не импортируется
-    SCREEN_WIDTH = 800
-    SCREEN_HEIGHT = 600
-    BLUE = (0, 0, 255)
-    PLAYER_SPEED = 5
-    PLAYER_SHOOT_DELAY = 200
-    IMAGES_DIR = 'assets/images'
-    PLAYER_WIDTH = 150
-    PLAYER_HEIGHT = 150
-
+from bullet import Bullet
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, all_sprites, bullets, sound_manager):
+    def __init__(self, all_sprites, bullets, sound_manager, screen_width, screen_height, images_dir, player_width=150, player_height=150):
         super().__init__(all_sprites)
-
-        # Загрузка изображения
+        # Загрузка изображения игрока или создание простого спрайта
         try:
-            image_path = os.path.join(IMAGES_DIR, 'player.PNG')
+            image_path = os.path.join(images_dir, 'player.png')
             self.image = pygame.image.load(image_path).convert_alpha()
-            # Масштабируем к нужному размеру
-            self.image = pygame.transform.scale(self.image, (PLAYER_WIDTH, PLAYER_HEIGHT))
-        except Exception as e:
-            print(f"Ошибка загрузки изображения игрока: {e}")
-            # Запасной вариант - создаем спрайт 100x150
-            self.image = pygame.Surface((PLAYER_WIDTH, PLAYER_HEIGHT), pygame.SRCALPHA)
-            # Рисуем объект
-            pygame.draw.polygon(self.image, BLUE, [
-                (50, 0), (20, 100), (80, 100)  # Нос и крылья
+            self.image = pygame.transform.scale(self.image, (player_width, player_height))
+        except:
+            # Создаем большой корабль
+            self.image = pygame.Surface((player_width, player_height), pygame.SRCALPHA)
+            pygame.draw.polygon(self.image, (0, 0, 255), [
+                (player_width // 2, 0), (player_width // 5, player_height * 2 // 3),
+                (player_width * 4 // 5, player_height * 2 // 3)
             ])
-            pygame.draw.rect(self.image, (0, 150, 255), (30, 100, 40, 50))
-            pygame.draw.rect(self.image, (255, 200, 0), (35, 120, 10, 20))
-            pygame.draw.rect(self.image, (255, 200, 0), (55, 120, 10, 20))
-            pygame.draw.circle(self.image, (100, 200, 255), (50, 40), 15)
+            pygame.draw.rect(self.image, (0, 150, 255),
+                           (player_width // 3, player_height * 2 // 3, player_width // 3, player_height // 3))
+            pygame.draw.rect(self.image, (255, 200, 0),
+                           (player_width // 3 + 5, player_height * 2 // 3 + 20, 10, 20))
+            pygame.draw.rect(self.image, (255, 200, 0),
+                           (player_width * 2 // 3 - 15, player_height * 2 // 3 + 20, 10, 20))
+            pygame.draw.circle(self.image, (100, 200, 255),
+                             (player_width // 2, player_height // 3), 15)
 
         self.rect = self.image.get_rect()
-        self.rect.centerx = SCREEN_WIDTH // 2
-        self.rect.bottom = SCREEN_HEIGHT - 10  # Поднимаем немного от нижнего края
+        self.rect.centerx = screen_width // 2
+        self.rect.bottom = screen_height - 10  # Поднимаем от нижнего края
 
-        self.speed = PLAYER_SPEED
+        self.speed = 5
         self.last_shot = 0
-        self.shoot_delay = PLAYER_SHOOT_DELAY
+        self.shoot_delay = 200
         self.health = 100
         self.bullets = bullets
         self.sound_manager = sound_manager
+        self.screen_width = screen_width
+        self.screen_height = screen_height
 
     def update(self):
+        # Обработка управления игроком
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             self.rect.x -= self.speed
         if keys[pygame.K_RIGHT]:
             self.rect.x += self.speed
-        """if keys[pygame.K_UP]:
-            self.rect.y -= self.speed
-        if keys[pygame.K_DOWN]:
-            self.rect.y += self.speed"""
 
-        # Ограничение движения
-        self.rect.clamp_ip(pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
+        # Ограничение движения в пределах экрана
+        self.rect.clamp_ip(pygame.Rect(0, 0, self.screen_width, self.screen_height))
 
+        # Стрельба с задержкой
         now = pygame.time.get_ticks()
         if keys[pygame.K_SPACE] and now - self.last_shot > self.shoot_delay:
             self.shoot()
             self.last_shot = now
 
     def shoot(self):
-        # Пули вылетают из центра
-        bullet_x = self.rect.centerx
-        bullet_y = self.rect.top + 20  # Немного отступаем от верха
-        try:
-            from bullet import Bullet
-            bullet = Bullet(bullet_x, bullet_y)
-            self.bullets.add(bullet)
-            self.sound_manager.play_sound('shoot')
-        except ImportError:
-            print("Ошибка импорта Bullet")
-
-    def take_damage(self, amount):
-        self.health -= amount
-        return self.health <= 0
+        # Создание пули и добавление в группу
+        bullet = Bullet(self.rect.centerx, self.rect.top + 20, 'assets/images', 25, 25)
+        self.bullets.add(bullet)
+        self.sound_manager.play_sound('shoot')
