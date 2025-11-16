@@ -20,7 +20,7 @@ class Bullet(pygame.sprite.Sprite):
         self.damage = 1
 
     def update(self):
-        # Движение пули вверх
+        # Движение пули по направлению вверх
         self.rect.y -= self.speed
         # Удаление пули, если она вышла за пределы экрана
         if self.rect.bottom < 0:

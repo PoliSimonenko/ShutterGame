@@ -27,7 +27,7 @@ class Enemy(pygame.sprite.Sprite):
         self.sound_manager.play_sound('enemy_spawn')
 
     def update(self):
-        # Движение врага вниз
+        # Движение врага по направлению вниз
         self.rect.y += self.speed
         # Удаление врага, если он вышел за пределы экрана
         if self.rect.top > self.screen_height:

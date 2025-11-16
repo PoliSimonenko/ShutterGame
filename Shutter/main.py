@@ -18,7 +18,7 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 YELLOW = (255, 255, 0)
 
-# Размеры спрайтов
+# Размеры спрайтов!
 PLAYER_WIDTH = 150
 PLAYER_HEIGHT = 150
 ENEMY_WIDTH = 50

@@ -35,7 +35,7 @@ class Explosion(pygame.sprite.Sprite):
         self.sound_manager.play_sound('explosion')
 
     def update(self):
-        # Анимация взрыва
+        # Анимация взрыва 3 кадра
         now = pygame.time.get_ticks()
         if now - self.last_update > self.frame_rate:
             self.last_update = now

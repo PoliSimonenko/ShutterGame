@@ -23,6 +23,7 @@ class Game:
             print("Фоновая музыка не найдена")
 
     def handle_events(self):
+        # Цикл обработки событий
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False

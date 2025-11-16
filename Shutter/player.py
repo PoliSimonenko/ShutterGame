@@ -11,7 +11,7 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.image.load(image_path).convert_alpha()
             self.image = pygame.transform.scale(self.image, (player_width, player_height))
         except:
-            # Создаем большой корабль
+            # Создаем объект
             self.image = pygame.Surface((player_width, player_height), pygame.SRCALPHA)
             pygame.draw.polygon(self.image, (0, 0, 255), [
                 (player_width // 2, 0), (player_width // 5, player_height * 2 // 3),
