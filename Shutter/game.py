@@ -1,6 +1,5 @@
 import pygame
 import sys
-import os
 from .config import *
 from player import Player
 from game_manager import GameManager
@@ -10,19 +9,14 @@ class Game:
     def __init__(self):
         pygame.init()
         pygame.mixer.init()
-
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        pygame.display.set_caption("Космический шутер")
         self.clock = pygame.time.Clock()
-
         self.game_manager = GameManager()
         self.player = Player(
             [self.game_manager.all_sprites],
-            self.game_manager.bullets
-        )
-
+            self.game_manager.bullets)
         try:
-            pygame.mixer.music.load(os.path.join(SOUNDS_DIR, 'background.wav'))
+            pygame.mixer.music.load(os.path.join(SOUNDS_DIR, 'background.mp3'))
             pygame.mixer.music.set_volume(0.3)
             pygame.mixer.music.play(-1)
         except:

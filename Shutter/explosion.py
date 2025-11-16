@@ -1,5 +1,4 @@
 import pygame
-import os
 
 try:
     from .config import *
@@ -11,7 +10,6 @@ except ImportError:
 class Explosion(pygame.sprite.Sprite):
     def __init__(self, center, all_sprites, sound_manager):
         super().__init__(all_sprites)
-
         self.frames = []
         # Загрузка кадров анимации
         for i in range(1, 4):
@@ -30,7 +28,7 @@ class Explosion(pygame.sprite.Sprite):
                 self.frames.append(frame)
 
         if not self.frames:
-            # Минимальный запасной вариант
+            # Запасной вариант
             frame = pygame.Surface((30, 30), pygame.SRCALPHA)
             pygame.draw.circle(frame, YELLOW, (15, 15), 15)
             self.frames = [frame, frame, frame]
@@ -38,12 +36,10 @@ class Explosion(pygame.sprite.Sprite):
         self.image = self.frames[0]
         self.rect = self.image.get_rect()
         self.rect.center = center
-
         self.frame = 0
         self.last_update = pygame.time.get_ticks()
         self.frame_rate = 50
         self.sound_manager = sound_manager
-
         self.sound_manager.play_sound('explosion')
 
     def update(self):

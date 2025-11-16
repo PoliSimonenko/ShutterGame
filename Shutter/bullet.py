@@ -1,5 +1,4 @@
 import pygame
-import os
 
 try:
     from .config import *
@@ -13,7 +12,6 @@ except ImportError:
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-
         # Загрузка изображения
         try:
             image_path = os.path.join(IMAGES_DIR, 'bullet.png')

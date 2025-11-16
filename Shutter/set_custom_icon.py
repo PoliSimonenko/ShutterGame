@@ -1,6 +1,6 @@
 import pygame
 import os
-from PIL import Image  # Нужно установить: pip install Pillow
+from PIL import Image
 
 
 def create_icon_from_photo(photo_path, output_size=(32, 32)):
@@ -12,30 +12,24 @@ def create_icon_from_photo(photo_path, output_size=(32, 32)):
         # Конвертируем в RGB если нужно
         if img.mode != 'RGB':
             img = img.convert('RGB')
-
         # Масштабируем до размера иконки
         img = img.resize(output_size, Image.Resampling.LANCZOS)
-
         # Сохраняем временный файл
         temp_path = 'temp_icon.png'
         img.save(temp_path)
-
         # Загружаем в pygame
         icon = pygame.image.load(temp_path)
-
         # Удаляем временный файл
         os.remove(temp_path)
-
         print(f"Иконка создана из {photo_path}")
         return icon
-
     except Exception as e:
         print(f"Ошибка создания иконки: {e}")
         return None
 
 
 def set_game_icon(photo_path=None):
-    """Устанавливает иконку для игры"""
+    # Устанавливает иконку
     pygame.init()
 
     if photo_path and os.path.exists(photo_path):
@@ -63,6 +57,5 @@ def set_game_icon(photo_path=None):
 
 
 if __name__ == "__main__":
-    # Укажите путь к вашему фото
-    photo_path = "my_photo.jpg"  # Замените на путь к вашему фото
+    photo_path = "my_photo.jpg"
     set_game_icon(photo_path)

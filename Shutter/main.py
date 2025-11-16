@@ -73,6 +73,7 @@ class SoundManager:
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
+        # Загрузка изображения пули или создание простого спрайта
         try:
             image_path = os.path.join(IMAGES_DIR, 'bullet.png')
             self.image = pygame.image.load(image_path).convert_alpha()
@@ -88,7 +89,9 @@ class Bullet(pygame.sprite.Sprite):
         self.damage = 1
 
     def update(self):
+        # Движение пули вверх
         self.rect.y -= self.speed
+        # Удаление пули, если она вышла за пределы экрана
         if self.rect.bottom < 0:
             self.kill()
 
@@ -96,6 +99,7 @@ class Bullet(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     def __init__(self, all_sprites, bullets, sound_manager):
         super().__init__(all_sprites)
+        # Загрузка изображения игрока или создание простого спрайта
         try:
             image_path = os.path.join(IMAGES_DIR, 'player.png')
             self.image = pygame.image.load(image_path).convert_alpha()
@@ -123,24 +127,24 @@ class Player(pygame.sprite.Sprite):
         self.sound_manager = sound_manager
 
     def update(self):
+        # Обработка управления игроком
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             self.rect.x -= self.speed
         if keys[pygame.K_RIGHT]:
             self.rect.x += self.speed
-        if keys[pygame.K_UP]:
-            self.rect.y -= self.speed
-        if keys[pygame.K_DOWN]:
-            self.rect.y += self.speed
 
+        # Ограничение движения в пределах экрана
         self.rect.clamp_ip(pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
 
+        # Стрельба с задержкой
         now = pygame.time.get_ticks()
         if keys[pygame.K_SPACE] and now - self.last_shot > self.shoot_delay:
             self.shoot()
             self.last_shot = now
 
     def shoot(self):
+        # Создание пули и добавление в группу
         bullet = Bullet(self.rect.centerx, self.rect.top + 20)
         self.bullets.add(bullet)
         self.sound_manager.play_sound('shoot')
@@ -149,6 +153,7 @@ class Player(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, all_sprites, enemies, sound_manager):
         super().__init__(all_sprites)
+        # Загрузка изображения врага или создание простого спрайта
         try:
             image_path = os.path.join(IMAGES_DIR, 'enemy.png')
             self.image = pygame.image.load(image_path).convert_alpha()
@@ -168,11 +173,14 @@ class Enemy(pygame.sprite.Sprite):
         self.sound_manager.play_sound('enemy_spawn')
 
     def update(self):
+        # Движение врага вниз
         self.rect.y += self.speed
+        # Удаление врага, если он вышел за пределы экрана
         if self.rect.top > SCREEN_HEIGHT:
             self.kill()
 
     def take_damage(self, damage):
+        # Обработка получения урона
         self.health -= damage
         if self.health <= 0:
             return True
@@ -182,6 +190,7 @@ class Enemy(pygame.sprite.Sprite):
 class Explosion(pygame.sprite.Sprite):
     def __init__(self, center, all_sprites, sound_manager):
         super().__init__(all_sprites)
+        # Загрузка кадров взрыва или создание простой анимации
         self.frames = []
         for i in range(1, 4):
             try:
@@ -196,6 +205,7 @@ class Explosion(pygame.sprite.Sprite):
                                    frame.get_width() // 2)
                 self.frames.append(frame)
 
+        # Если не удалось загрузить кадры, создаем простой взрыв
         if not self.frames:
             frame = pygame.Surface((60, 60), pygame.SRCALPHA)
             pygame.draw.circle(frame, YELLOW, (30, 30), 30)
@@ -211,6 +221,7 @@ class Explosion(pygame.sprite.Sprite):
         self.sound_manager.play_sound('explosion')
 
     def update(self):
+        # Анимация взрыва
         now = pygame.time.get_ticks()
         if now - self.last_update > self.frame_rate:
             self.last_update = now
@@ -225,22 +236,19 @@ class Explosion(pygame.sprite.Sprite):
 
 
 def draw_game_over(screen, score, font):
-    """Отрисовывает экран завершения игры со счетом"""
+    # Отрисовывает экран завершения игры со счетом
     overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
     overlay.set_alpha(180)  # Полупрозрачный черный фон
     overlay.fill(BLACK)
     screen.blit(overlay, (0, 0))
-
     # Заголовок
     game_over_text = font.render("ИГРА ОКОНЧЕНА", True, RED)
     game_over_rect = game_over_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 60))
     screen.blit(game_over_text, game_over_rect)
-
     # Счет
     score_text = font.render(f"Ваш счет: {score}", True, YELLOW)
     score_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 10))
     screen.blit(score_text, score_rect)
-
     # Инструкция по перезапуску
     restart_text = font.render("Нажмите R для перезапуска", True, WHITE)
     restart_rect = restart_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 40))
@@ -248,7 +256,7 @@ def draw_game_over(screen, score, font):
 
 
 def load_game_icon():
-    """Загружает и устанавливает иконку игры из assets/images/icon.jpg"""
+    # Загружает и устанавливает иконку игры
     try:
         icon_path = os.path.join(IMAGES_DIR, 'icon.jpg')
         icon = pygame.image.load(icon_path)
@@ -272,9 +280,9 @@ def load_game_icon():
 
 
 def main():
+    # Инициализация Pygame
     pygame.init()
     pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=1024)
-
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Цыплячья атака")
 
@@ -292,7 +300,7 @@ def main():
         background = None
         print("Фоновое изображение не найдено")
 
-    # Звуки
+    # Инициализация менеджера звуков
     sound_manager = SoundManager()
     sound_manager.load_sound('shoot', os.path.join(SOUNDS_DIR, 'shoot.wav'), 0.7)
     sound_manager.load_sound('explosion', os.path.join(SOUNDS_DIR, 'explosion.wav'), 0.8)
@@ -305,23 +313,26 @@ def main():
     bullets = pygame.sprite.Group()
     enemies = pygame.sprite.Group()
 
-    # Игрок
+    # Создание игрока
     player = Player(all_sprites, bullets, sound_manager)
 
+    # Переменные
     score = 0
     font = pygame.font.Font(None, 36)
     large_font = pygame.font.Font(None, 48)  # Большой шрифт для экрана завершения
     enemy_timer = 0
     game_over = False
 
+    # Главный игровой цикл
     running = True
     while running:
+        # Обработка событий
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r and game_over:
-                    # Перезапуск
+                    # Перезапуск игры
                     all_sprites.empty()
                     bullets.empty()
                     enemies.empty()
@@ -331,17 +342,17 @@ def main():
                     sound_manager.play_music()
 
         if not game_over:
-            # Спавн врагов
+            # Появление врагов с интервалом
             now = pygame.time.get_ticks()
             if now - enemy_timer > 1000:
                 Enemy(all_sprites, enemies, sound_manager)
                 enemy_timer = now
 
-            # Обновление
+            # Обновление всех спрайтов
             all_sprites.update()
             bullets.update()
 
-            # Столкновения
+            # Проверка столкновений пуль с врагами
             hits = pygame.sprite.groupcollide(enemies, bullets, False, True)
             for enemy, bullet_list in hits.items():
                 for bullet in bullet_list:
@@ -350,6 +361,7 @@ def main():
                         enemy.kill()
                         score += 10
 
+            # Проверка столкновений игрока с врагами
             hits = pygame.sprite.spritecollide(player, enemies, True)
             for hit in hits:
                 Explosion(hit.rect.center, all_sprites, sound_manager)
@@ -364,19 +376,21 @@ def main():
         else:
             screen.fill(BLACK)
 
+        # Отрисовка всех спрайтов
         all_sprites.draw(screen)
         bullets.draw(screen)
 
-        # UI во время игры
+        # Отрисовка счет и здоровье
         score_text = font.render(f"Счет: {score}", True, WHITE)
         health_text = font.render(f"Здоровье: {player.health}", True, WHITE)
         screen.blit(score_text, (10, 10))
         screen.blit(health_text, (10, 50))
 
-        # Экран завершения игры
+        # Отрисовка экрана завершения игры
         if game_over:
             draw_game_over(screen, score, large_font)
 
+        # Обновление экрана
         pygame.display.flip()
         clock.tick(FPS)
 

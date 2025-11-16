@@ -1,6 +1,5 @@
 import pygame
 import random
-import os
 
 try:
     from .config import *
@@ -16,7 +15,6 @@ except ImportError:
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, all_sprites, enemies, sound_manager):
         super().__init__(all_sprites)
-
         # Загрузка изображения
         try:
             image_path = os.path.join(IMAGES_DIR, 'enemy.png')
@@ -30,12 +28,10 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(0, SCREEN_WIDTH - self.rect.width)
         self.rect.y = random.randint(-100, -40)
-
         self.speed = random.uniform(ENEMY_SPEED * 0.5, ENEMY_SPEED * 1.5)
         self.health = ENEMY_HEALTH
         enemies.add(self)
         self.sound_manager = sound_manager
-
         self.sound_manager.play_sound('enemy_spawn')
 
     def update(self):
